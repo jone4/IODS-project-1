@@ -6,3 +6,6 @@
 The course can begin!
 
 https://github.com/jone4/IODS-project-1
+```{r}
+```
+
