@@ -13,7 +13,6 @@ output:
 
 ***
   
-testi
 ```{r child = "chapter1.Rmd"}
 
 
