@@ -6,6 +6,8 @@ output: html_document
 ---
 # chapter 3
 
+
+testi2
 ```{r}
 
 setwd("C:/Users/T430/Documents/IODS-project-1/data")
