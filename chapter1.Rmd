@@ -5,6 +5,8 @@
 
 Hello again.
 
+Let's write here on github
+
 The course can begin!
 
 https://github.com/jone4/IODS-project-1
