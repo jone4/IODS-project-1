@@ -5,7 +5,7 @@
 test.
 Hello again.
 
-Let's write here on github
+Let's write here on github, again
 
 The course can begin!
 
