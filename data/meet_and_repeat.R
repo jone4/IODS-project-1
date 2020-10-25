@@ -23,12 +23,12 @@ BPRSL <-  BPRS %>% gather(key = weeks, value = bprs, -treatment, -subject)
 BPRSL <-  BPRSL %>% mutate(week = as.integer(substr(weeks, 5,5)))
 
 RATSL <- RATS %>%
-  gather(key = WD, value = Weigth, -ID, -Group) %>%
+  gather(key = WD, value = Weight, -ID, -Group) %>%
   mutate(Time = as.integer(substr(WD,3,4))) 
 
 #4.
 summary(RATSL)
 summary(RATS)
 
-write.table(RATSL, "RATSL.txt")
-write.table(BPRSL, "BPRSL.txt")
+write.table(RATSL, "RATSL.txt", quote=F)
+write.table(BPRSL, "BPRSL.txt", quote=F)

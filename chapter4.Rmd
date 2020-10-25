@@ -1,3 +1,8 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 ```{r}
 #2.
 
@@ -9,7 +14,7 @@ dim(Boston)
 
 testi= cbind(Boston[1:2], Boston[3])
 
-testaa= testi[c(,3, 1:2)]
+testaa= testi[c(3, 1:2)]
 
 ```
 

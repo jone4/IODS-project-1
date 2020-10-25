@@ -1,0 +1,384 @@
+---
+title: |
+  | #tilastoMOOC 2019--2020
+  | **Helsinki Social Statistics**
+  | Chapter 10. Regression
+author: "Knitted by    **Forename Surname**    on   12 December 2019"
+subtitle: '*Now, pick roles for the variables and start modeling. I predict you are
+  good!*'
+output:
+  html_document:
+    highlight: haddock
+    number_section: no
+    theme: flatly
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+Chapter 10 consists of 7 exercises: 10.1 -- 10.7.
+Go to each exercise in turn and do as follows:
+
+1. Read the brief description of the exercise.
+2. Run the (possible) pre-exercise-code chunk.
+3. Follow the instructions to fix the R code!
+
+General information on the MOOC platform (under Theme 1). Have fun! `:-)`
+
+
+
+
+## 10.1 Packages in R
+
+Welcome to chapter 10: **Regression**. We'll start with an important R feature - packages. 
+
+There are a lot of functions in R. But actually, the functions in R come from a standard set of *packages*. A package is simply a collection of R functions. Besides the basic packages, you can install and use (or develop!) other packages too. 
+
+You can install packages through CRAN (The Comprehensive R Archive Network). From the CRAN website [https://cran.r-project.org/](https://cran.r-project.org/): 
+> CRAN is a network of ftp and web servers around the world that store identical, up-to-date, versions of code and documentation for R. 
+
+List of available CRAN packages can be seen [here](https://cran.r-project.org/web/packages/available_packages_by_name.html). There are thousands of them, made by R users around the world. In order to get a package accepted to CRAN, the package must be well documented: every function must have a help page.
+
+As you now have RStudio (and R) in your own computer, you can install R packages anytime by calling   `install.packages("name_of_the_package")`. This is best to be done in the Console or in the Packages pane, where there is an Install button.
+
+To use installed packages, you need to access them. This is done by calling `library(name_of_the_package)`.
+
+```{r}
+(3.7-3.5)/ (0.35/sqrt(10))
+
+pt(1.81, 9, lower.tail = F)
+pnorm(1.81, lower.tail=F)
+?pnorm
+
+
+(3.8-3.5)/ (0.7/sqrt(16))
+
+
+pt(1.71, 15, lower.tail = F)
+pnorm(1.71, lower.tail=F)
+```
+
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+learning2014 <-  read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+```
+
+### Instructions
+- One of the most famous and used packages outside the basic R is `ggplot2`. The `ggplot2` package is a plotting system for R, and it draws pretty pictures for you with small effort. 
+- The `ggplot2` package has a website [http://ggplot2.org/](http://ggplot2.org/) where you can see documentation about the package. 
+- Execute the access code for `ggplot2`.
+- Draw a plot of gender and points. The `fill` argument adds a legend to the plot. 
+- Create the `grades` object.
+- Do a plot of `grades` and `attitude`. Set `grades` as a legend.
+
+### R code
+```{r}
+# Work with the exercise in this chunk, step-by-step. Fix the R code!
+
+# learning2014 is available 
+
+# Access ggplot2
+library(ggplot2)
+
+# Draw a plot of gender and points
+qplot(gender, points, data=learning2014, geom="boxplot", fill=gender)
+
+# Create the grades factor
+grades <- cut(learning2014$points, breaks = c(0, 11, 15, 19, 23, 27, 33), include.lowest = TRUE)
+
+# Draw a plot of grades and attitude
+qplot(grades, attitude, data= learning2014, fill= attitude)
+
+```
+
+You have the keys do anything. Awesome!
+
+
+## 10.2 Exploring the relationship of two variables
+
+It is always a good idea to start with the simplest possible explorations before more complicated statistical analysis. A scatter plot is always a good starting point when analyzing the relationship between variables. Sample correlations are another useful tool.
+
+In the ggplot2 library, scatter plots can be drawn with the general `qplot()` function. `geom_smooth()` can be used to add a regression line to the plot. In base R `cor.test()` can be used to compute a correlation with a confidence interval.
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+learning2014 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+```
+
+### Instructions
+- Access the ggplot2 library, modify the learning2014 data and draw a scatter plot of `attitude` and `points`.
+- Adjust the scatter plot: Add code `+ geom_smooth()` after `qplot()`. Write the code to the same line and do not forget the plus sign. Execute the row.
+- Give the function `geom_smooth()` the argument `method = "lm"` and execute the line again. This adds a regression line along with a confidence interval.
+- Compute the correlation of `attitude` and `points` with `cor.test()`
+- Is a linear relationship between attitude and points plausible? 
+- How would you characterize the strength of that relationship?
+
+### R code
+```{r}
+# Work with the exercise in this chunk, step-by-step. Fix the R code!
+
+# learning2014 is available
+
+# Access ggplot2 functions
+library(ggplot2)
+
+# Exlude students who did not attend any exams (points == 0)
+learning2014 <- learning2014[learning2014$points != 0, ]
+
+# Create objects attitude and points
+attitude <- learning2014$attitude
+points <- learning2014$points
+
+# A scatter plot of attitude and points
+qplot(attitude, points) + geom_smooth(method= "lm")
+
+# Correlation with a confidence intervals
+cor.test(attitude, points)
+
+```
+
+## 10.3 What is a linear model?
+
+Genrally, a [statistical model](https://en.wikipedia.org/wiki/Statistical_model) embodies a set of assumptions concerning the generation of the observed data and similar data from a larger population. A [linear model](https://en.wikipedia.org/wiki/Linear_regression) makes the following assumptions:
+
+- The mean of the response variable is a *linear combination* of the explanatory variable(s) and the parameters.
+- The prediction errors of the model are normally distributed.
+- The deviation in prediction errors is constant over possible values of the explanatory variable(s).
+
+Regression analysis is based on a linear model - a simple statistical model in which a linear relationship between the mean of the variable of interest (`y`) and some explanatory variable(s) (`x`) is assumed:
+
+$$y = a + b \cdot x + errors$$ 
+
+where `a` and `b` are unknown parameters to be estimated (a is called the *intercept* and b the *regression coefficient*).
+
+### Instructions
+- Create some toy data, choose the parameters, produce random errors and form the linear model between `x` and `y`
+- Draw a scatterplot of `x` and `y` using `plot()`.
+- Compute the correlation of `x` and `y`
+- The *coefficient of determination* (also called "R squared" - does not refer to the R program, however!) is the correlation squared. Compute it.
+- Change the parameter $b$ of the linear model to -1.5 and repeat the above computations.
+
+### R code
+```{r}
+# Work with the exercise in this chunk, step-by-step. Fix the R code!
+
+# Here we produce data from a linear model where we choose the parameters
+
+# Create some toy data
+x <- c(1,3,7,3,5,8,2,3,10,9,4,5,6,1,2,4,6,6,7,6,3,3,1)
+
+# Choose the parameters and produce random errors
+a <- 7
+b <- 1.5
+e <- rnorm(length(x), sd = 2)
+
+# A linear model for y
+y <- a + b*x + e
+
+# Scatter plot of x and y
+plot(x,y)
+
+# Correlation (R)
+cor(x,y)
+
+# Coefficient of determination (R squared)
+cor(x,y)^2
+
+```
+
+## 10.4 Fitting a linear model
+
+Regression analysis is based on a linear model of the form
+
+$$y = a + b \cdot x + errors$$ 
+
+where $x$ denotes the explanatory variable(s), $y$ the dependent variable and $a$ and $b$ are parameters of the model, which need to be estimated using the data. In R, the parameters of a linear model can be estimated using the `lm()` function. This is also called fitting a model.
+
+`lm()` takes as it's first argument a *formula*, which is a symbolic description of the model. For example 
+
+`my_y ~ my_x` 
+
+is a formula stating that `my_y` depends on `my_x`. The second argument of `lm()` is `data`, which defines the data frame where `my_x` and `my_y` are found. `lm()` returns an R object which contains information about the fitted model.
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+library(ggplot2)
+learning2014 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+
+# Exlude students who did not attend exams (points = 0)
+learning2014 <- learning2014[learning2014$points != 0,]
+
+# Create objects attitude and points
+attitude <- learning2014$attitude
+points <- learning2014$points
+
+# a scatter plot of attitude and points
+qplot(attitude, points) + geom_smooth(method = "lm")
+
+```
+
+### Instructions
+- Adjust the code: replace both `1`s and give the `lm()` function a formula where points is explained by attitude. Adjust the data argument to use the learning2014 data.frame
+- Use `summary()` to look at a summary of the fitted model. 
+
+
+### R code
+```{r}
+# Work with the exercise in this chunk, step-by-step. Fix the R code!
+
+# learning2014 is available
+
+# Explain students statistics exam points with their attitude toward statistics using a linear model
+
+# Create object my_fit explaining points with attitude in the learning2014 data
+my_fit <- lm(1 ~ 1, data = NULL) #??? #??? #???
+
+# Look at a summary of my_fit
+#???
+
+```
+
+## 10.5 Interpreting a fitted model
+
+Now that we have estimated the parameters of our (simple) model, it is time to interpret the results! The focus is mainly on the regression coefficients and their p-values. Find the instructions of interpreting these (from a suitable web resource, for example).
+
+Type `summary(my_fit)` on the R console. Which of the following choices is correct?
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+library(ggplot2)
+learning2014 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+
+# Exlude students who did not attend exams (points = 0)
+learning2014 <- learning2014[learning2014$points != 0,]
+
+# Create objects attitude and points
+attitude <- learning2014$attitude
+points <- learning2014$points
+
+# a scatter plot of attitude and points
+qplot(attitude, points) + geom_smooth(method = "lm")
+
+# Create object my_fit explaining points with attitude in the learning2014 data
+my_fit <- lm(points ~ attitude, data = learning2014)
+```
+
+### Instructions
+- When a students attitude increases by one unit, the expected increase of exam points is 11.6 units. The effect is statistically significant.
+- When a students attitude increases by one unit, the expected decrease of exam points is 3.5 units. The effect is statistically significant.
+- When a students attitude increases by one unit, the average increase of exam points is 3.5 units. The effect is statistically significant.
+- When a students attitude increases by one unit, the expected increase of exam points is 3.5 units. The effect is not statistically significant.
+
+Which choice is correct? Copy it below:
+
+- ???
+
+## 10.6 Checking the validity of model assumptions
+
+Let us now return to the <a href = "https://en.wikipedia.org/wiki/Linear_regression#Assumptions" target="_blank">assumptions</a> of our model. We started by looking at the plausibility of a linear relationship, which was the first assumption. We have two assumptions left unchecked:
+
+1. **The variability in (prediction) errors is constant over possible values of the explanatory variable(s)**
+2. **The (prediction) errors are normally distributed**
+
+The former can be studied graphically by plotting the predictions (fitted values) of our model against the prediction errors (residuals). If there is a visible pattern, that would mean a likely violation to the constant variability assumption.  
+
+Also the latter assumption can be studied graphically. A <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">q-q plot</a> is a powerful way to check if observations follow a theoretical distribution. If this is the case, then the quantile points in the q-q plot should approximately follow a straight increasing line. Deviations from the normality assumption should show a clear non-linear pattern.
+
+When a linear model object such as `my_fit` is given to the `plot()` function as the first argument, `plot()` draws multiple diagnostic plots related to the model. Type `plot(my_fit)` on the R console and choose the correct answer.
+
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+learning2014 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+
+# Exlude students who did not attend exams (points = 0)
+learning2014 <- learning2014[learning2014$points != 0,]
+
+# Create object my_fit explaining points with attitude in the learning2014 data
+my_fit <- lm(points ~ attitude, data = learning2014)
+
+```
+
+### Instructions
+- The scatter plot of fitted values and residuals shows that the values of the residuals depend on the fitted values, violating assumption 1. The q-q plot shows that the distribution of the residuals is approximately normal.
+- The scatter plot of fitted values and residuals shows that the values of the residuals do not depend on the fitted values. The q-q plot shows that the residuals and fitted values are independent.
+- The scatter plot of fitted values and residuals shows that the values of the residuals do not depend on the fitted values. The q-q plot shows that the distribution of the residuals is approximately normal.
+- The scatter plot of fitted values and residuals shows that the values of the residuals do not depend on the fitted values. The q-q plot shows that the distribution of the residuals is not approximately normal, violating assumption 2.
+
+Which choice is correct? Copy it below:
+
+- ???
+
+Great work! You are really learning the linear models.
+
+
+## 10.7 Making predictions based on the model
+
+Okey, so we have a linear model which seems to fit our standards. What can we do with it? 
+
+The model quantifies the relationship between the explanatory variable(s) (attitude) and the dependent variable (points). The model can also be used for predicting the dependent variable based on new observations of the explanatory variable(s).
+
+
+```{r, echo=FALSE}
+# Pre-exercise-code (Run this code chunk first! Do NOT edit it.)
+
+# Click the green arrow ("Run Current Chunk") in the upper-right corner of this chunk. This will initialize the R objects needed in the exercise. Then move to Instructions of the exercise to start working.
+
+learning2014 <- read.table("http://www.helsinki.fi/~kvehkala/JYTmooc/learning2014.txt", sep = "\t", header = TRUE)
+
+# Exlude students who did not attend exams (points = 0)
+learning2014 <- learning2014[learning2014$points != 0,]
+
+# Create object my_fit explaining points with attitude in the learning2014 data
+my_fit <- lm(points ~ attitude, data = learning2014)
+```
+
+### Instructions
+- Create object `my_fit` and `new_attitudes`
+- Adjust the code: Replace `NULL` with the new attitudes to create a new data frame with an attitude column
+- Print out the new data frame
+- Use the `predict()` function to predict the new students exam points based on their attitude. The argument `newdata` should be a data.frame with the new observations for the explanatory variable(s).
+
+
+### R code
+```{r}
+# Work with the exercise in this chunk, step-by-step. Fix the R code!
+
+# learning2014 is available
+
+# Create object my_fit explaining students exam points with attitude towards statistics
+my_fit <- lm(points ~ attitude, data = learning2014)
+
+# New observations
+new_attitudes <- c("Miia" = 3.8, "Matti"= 4.4, "Riikka" = 2.2, "Pekka" = 2.9)
+new_data <- data.frame(attitude = new_attitudes)
+
+# Print out the new data
+new_data
+
+# Predict the new students exam points based on attitude
+predict(my_fit, newdata = new_data)
+
+```
+
+Awesome work! That was it! Thank you so much for participating in the course!
+
+Please continue learning more R in the future. I predict that it will be beneficial to you!
