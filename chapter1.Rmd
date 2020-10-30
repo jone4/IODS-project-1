@@ -4,7 +4,7 @@
 *Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you can use R Markdown syntax.*
 
 Hello again.
-Pöö
+Pööpöö
 
 Let's write here on github, again
 
